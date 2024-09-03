@@ -1,3 +1,6 @@
+
+Nguyen Xuan Trieu _ Vo Tran Nha Linh
+
 # MILQ
 
 Greedy circuit cutting and a minimal scheduler based on a Mixed Integer Linear Programming problem.
