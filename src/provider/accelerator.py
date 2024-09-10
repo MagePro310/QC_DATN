@@ -9,7 +9,7 @@ from src.tools import optimize_circuit_online
 
 
 class Accelerator:
-    """Wrapper for a single backend simulator."""
+    """Wrapper a single backend simulator."""
 
     def __init__(
         self, backend: IBMQBackend, shot_time: int = 1, reconfiguration_time: int = 0
