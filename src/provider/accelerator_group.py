@@ -36,7 +36,7 @@ class AcceleratorGroup:
 
     @property
     def qubits(self) -> int:
-        """Tolal number of qubits.
+        """Total number of qubits.
 
         Returns:
             int: The total number of qubits.
