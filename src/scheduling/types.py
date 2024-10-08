@@ -33,7 +33,7 @@ class JobHelper:
     """Helper to keep track of job names."""
 
     name: str
-    circuit: QuantumCircuit | None  # TODO optional necessary?
+    circuit: QuantumCircuit | None  # TODO    optional necessary?
 
 
 @dataclass

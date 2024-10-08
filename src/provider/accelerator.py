@@ -67,10 +67,10 @@ class Accelerator:
         """
         # TODO: doing a full hardware-aware compilation just to get the processing
         # time is not efficient. An approximation would be better.
-        be = self._backend.value()
-        transpiled_circuit = transpile(circuit, be, scheduling_method="alap")
+        be = self._backend.value()                                                  # Get the backend
+        transpiled_circuit = transpile(circuit, be, scheduling_method="alap")       # Transpile the circuit
         return Accelerator._time_conversion(
-            transpiled_circuit.duration, transpiled_circuit.unit, dt=be.dt
+            transpiled_circuit.duration, transpiled_circuit.unit, dt=be.dt          # Convert the duration to µs
         )
 
     def compute_setup_time(
@@ -87,9 +87,9 @@ class Accelerator:
             float: Set up time from circuit_from to circuit_to in µs.
         """
         if circuit_from is None:
-            return self._reconfiguration_time
+            return self._reconfiguration_time                               # Return the reconfiguration time
         if circuit_to is None:
-            return self._reconfiguration_time
+            return self._reconfiguration_time                               # Return the reconfiguration time
         return self._reconfiguration_time
 
     @property

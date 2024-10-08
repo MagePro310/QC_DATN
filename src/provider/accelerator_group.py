@@ -12,12 +12,12 @@ class AcceleratorGroup:
     Provides a single entrypoint for multiple accelerators.
     """
 
-    def __init__(self, accelerators: list[Accelerator]) -> None:
+    def __init__(self, accelerators: list[Accelerator]) -> None:                # Initialize the class with a list of accelerators
         self._accelerators = accelerators
         self._qpu_qubits = [acc.qubits for acc in accelerators]
 
     @property
-    def qpus(self) -> list[int]:
+    def qpus(self) -> list[int]:                                                # Get the number of qubits per qpu
         """Indicates the number of qubits per qpu.
 
         Returns:
@@ -26,7 +26,7 @@ class AcceleratorGroup:
         return self._qpu_qubits
 
     @property
-    def accelerators(self) -> list[Accelerator]:
+    def accelerators(self) -> list[Accelerator]:                                # Get the wrapped accelerators
         """Get the wrapped accelerators.
 
         Returns:
@@ -35,7 +35,7 @@ class AcceleratorGroup:
         return self._accelerators
 
     @property
-    def qubits(self) -> int:
+    def qubits(self) -> int:                                                     # Get the total number of qubits        
         """Total number of qubits.
 
         Returns:
@@ -43,7 +43,7 @@ class AcceleratorGroup:
         """
         return sum(self._qpu_qubits)
 
-    def run_and_get_counts(
+    def run_and_get_counts(                                                      # Run and get counts for all accelerators
         self, circuits: list[QuantumCircuit]
     ) -> list[dict[int, int]]:
         """Simple run and get counts simultaneously for all accelerators.
@@ -56,13 +56,13 @@ class AcceleratorGroup:
             list[dict[int, int]]: A list of result counts, preserving order.
         """
         counts = []
-        for circuit, accelerator in zip(circuits, self._accelerators):
+        for circuit, accelerator in zip(circuits, self._accelerators):              
             # TODO in parallel!
-            counts.append(accelerator.run_and_get_counts(circuit))
+            counts.append(accelerator.run_and_get_counts(circuit))                                       
         # TODO do some magic to figure out which counts belong to which circuit
         return counts
 
-    def run_jobs(self, jobs: list[ScheduledJob]) -> list[CombinedJob]:
+    def run_jobs(self, jobs: list[ScheduledJob]) -> list[CombinedJob]:            # Run a list of scheduled jobs on their respective accelerators
         """Runs a list of scheduled jobs on their respective accelerators.
 
         Creates a tuple of jobs to run at the same time onf different qpus.
@@ -87,14 +87,14 @@ class AcceleratorGroup:
             initargs=(idx_queue,),
         ) as pool:
             results = []
-            for job in zip_longest(*jobs_per_qpu.values()):  # Run jobs in parallel
+            for job in zip_longest(*jobs_per_qpu.values()):                         # Run jobs in parallel
                 result = pool.apply_async(_run_job, [self._accelerators, job])
                 results.append(result)
             results = [result.get() for result in results]
         results = [result for result in results if result is not None]
         return results
 
-    def run_experiments(self, experiments: list[Experiment]) -> list[Experiment]:
+    def run_experiments(self, experiments: list[Experiment]) -> list[Experiment]:   # Run all circuits belonging to a list of experiments
         """Runs all circuits belonging to a list of experiments.
 
         Just takes the circuits without any consideration.
@@ -124,12 +124,12 @@ class AcceleratorGroup:
         return results
 
 
-def _init_accs(queue: Queue) -> None:
+def _init_accs(queue: Queue) -> None:                                           # Initialize the accelerators
     idx = queue.get()
     current_process().name = str(idx)
 
 
-def _run_func(accs: list[Accelerator], exp: Experiment) -> Experiment:
+def _run_func(accs: list[Accelerator], exp: Experiment) -> Experiment:          # Run an experiment on a single accelerator
     """Wrapper to run Experiment on a single accelerator.
 
     Args:
@@ -151,7 +151,7 @@ def _run_func(accs: list[Accelerator], exp: Experiment) -> Experiment:
     return exp
 
 
-def _run_job(
+def _run_job(                                                                   # Run a job on a single accelerator
     accs: list[Accelerator], jobs: tuple[ScheduledJob | None]
 ) -> CombinedJob | None:
     """Selects a job from a tuple of jobs and runs it on the respective accelerator.

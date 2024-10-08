@@ -15,13 +15,13 @@ class Experiment:
     Contains the information for one partition.
     """
 
-    circuits: list[QuantumCircuit] | None
-    coefficients: list[tuple[float, WeightType]]
-    n_shots: int
-    observables: PauliList | dict[str, PauliList]
-    partition_label: str
-    result_counts: list[dict[str, int]] | None
-    uuid: UUID
+    circuits: list[QuantumCircuit] | None                           # List of circuits
+    coefficients: list[tuple[float, WeightType]]                    # List of coefficients
+    n_shots: int                                                    # Number of shots
+    observables: PauliList | dict[str, PauliList]                   # Observables
+    partition_label: str                                            # Partition label
+    result_counts: list[dict[str, int]] | None                      # List of result counts
+    uuid: UUID                                                      # UUID
 
 
 @dataclass
@@ -30,15 +30,15 @@ class CircuitJob:
     The circuit is enriched with information for reconstruction.
     """
 
-    coefficient: tuple[float, WeightType] | None
-    cregs: int
-    index: int
-    circuit: QuantumCircuit | None
-    n_shots: int
-    observable: PauliList  # Should be single pauli
-    partition_label: str
-    result_counts: dict[str, int] | None
-    uuid: UUID
+    coefficient: tuple[float, WeightType] | None                    # Coefficient
+    cregs: int                                                      # Number of classical registers
+    index: int                                                      # Index
+    circuit: QuantumCircuit | None                                  # Quantum circuit
+    n_shots: int                                                    # Number of shots
+    observable: PauliList                                           # Should be single pauli
+    partition_label: str                                            # Partition label
+    result_counts: dict[str, int] | None                            # Result counts for the circuit
+    uuid: UUID                                                      # UUID
 
 
 @dataclass
@@ -47,7 +47,7 @@ class CombinedJob:
     Order of the lists has to be correct for all!
     """
 
-    coefficients: list[tuple[float, WeightType]] = field(default_factory=list)
+    coefficients: list[tuple[float, WeightType]] = field(default_factory=list)      
     cregs: list[int] = field(default_factory=list)
     indices: list[int] = field(default_factory=list)
     circuit: QuantumCircuit | None = None
