@@ -5,7 +5,8 @@ from copy import deepcopy
 import pulp
 
 from .types import JobResultInfo, LPInstance, PTimes, STimes
-
+# PTimes: Time processing
+# STimes: Time set up
 
 def calculate_makespan(
     lp_instance: LPInstance,
@@ -83,55 +84,56 @@ def _calc_makespan(
     machines: list[str],
     for_bin: bool = False,
 ) -> float:
-    s_times = pulp.makeDict(
+    s_times = pulp.makeDict(                                                        #create a dictionary with the setup times, job_names: last job, next job, machine
         [job_names, job_names, machines],
         setup_times,
         0,
     )
-    p_times = pulp.makeDict(
+    p_times = pulp.makeDict(                                                        #create a dictionary with the processing times, job_names: machine  
         [job_names[1:], machines],
         process_times,
         0,
     )
 
-    assigned_machines: defaultdict[str, list[JobResultInfo]] = defaultdict(list)
+    assigned_machines: defaultdict[str, list[JobResultInfo]] = defaultdict(list)    #create a dictionary with the assigned machines and the jobs assigned to them
     for job in jobs:
-        assigned_machines[job.machine].append(job)
-    makespans = []
-    for machine, assigned_jobs in assigned_machines.items():
-        assigned_jobs_copy = deepcopy(assigned_jobs)
-        for job in sorted(assigned_jobs, key=lambda x: x.start_time):
+        assigned_machines[job.machine].append(job)                                  #append the job to the list of jobs assigned to the machine
+    makespans = []                                                                  #create a list with the makespans for each machine
+    for machine, assigned_jobs in assigned_machines.items():                        #iterate over the machines and the jobs assigned to them
+        assigned_jobs_copy = deepcopy(assigned_jobs)                                #create a deepcopy of the assigned jobs
+        for job in sorted(assigned_jobs, key=lambda x: x.start_time):               #arrange the jobs in the order of their start time
             # Find the last predecessor that is completed before the job starts
             # this can technically change the correct predecessor to a wrong one
             # because completion times are updated in the loop
             # I'm not sure if copying before the loop corrects this
-            if for_bin:
-                last_completed = max(
+            if for_bin:                                                             #if the jobs are for the bin, the last completed job is the one with the maximum completion time
+                last_completed = max(                                               #find the job with the maximum completion time
                     (job for job in assigned_jobs), key=lambda x: x.completion_time
                 )
-                if job.start_time == 0.0:
-                    last_completed = JobResultInfo("0", machine, 0.0, 0.0, 0)
-                job.start_time = last_completed.completion_time
-            else:
-                last_completed = _find_last_completed(
+                if job.start_time == 0.0:                                           #if the start time of the job is 0, the last completed job is the one with the minimum completion time
+                    last_completed = JobResultInfo("0", machine, 0.0, 0.0, 0)       # create dummy job with 0 completion time
+                job.start_time = last_completed.completion_time                     #set the start time of the job to the completion time of the last completed job
+            else:                                                                   #if the jobs are not for the bin
+                last_completed = _find_last_completed(                              #find the last completed job before the current job
                     job.name, assigned_jobs_copy, machine
                 )
-                if job.start_time == 0.0:
-                    last_completed = JobResultInfo("0", machine, 0.0, 0.0, 0)
-                job.start_time = next(
+                if job.start_time == 0.0:                                           #if the start time of the job is 0, the last completed job is the one with the minimum completion time
+                    last_completed = JobResultInfo("0", machine, 0.0, 0.0, 0)       # create dummy job with 0 completion time
+                job.start_time = next(                                              # set the start time of the job to the completion time of the last completed job            
                     (
-                        j.completion_time
-                        for j in assigned_jobs
-                        if last_completed.name == j.name
+                        j.completion_time                                           # completion time of the job
+                        for j in assigned_jobs                                      # iterate over the assigned jobs
+                        if last_completed.name == j.name                            # if the last completed job is the current job set the completion time of the job
                     ),
-                    0.0,
+                    0.0,                                                            # default value if the job is not found
                 )
             # calculate p_j + s_ij
-            job.completion_time = (  # check if this order is correct
-                last_completed.completion_time
+            # job.completion_time of the current job = the completion time of the last completed job + the processing time of the job + the setup time of the last completed job and the current job
+            job.completion_time = (  # check if this order is correct                  
+                last_completed.completion_time                                          
                 + p_times[job.name][machine]
                 + s_times[last_completed.name][job.name][machine]
             )
-        makespans.append(max(job.completion_time for job in assigned_jobs))
+        makespans.append(max(job.completion_time for job in assigned_jobs))         #append the maximum completion time of the jobs assigned to the machine to the makespans list
 
-    return max(makespans)
+    return max(makespans)                                                           #return the maximum makespan of the machines
