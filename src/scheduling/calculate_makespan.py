@@ -35,24 +35,32 @@ def calculate_makespan(
         lp_instance.machines,
     )
 
-
+# Description: This function find the last completed job before the job "job_name" begins.
+# Parameters: job_name: str, jobs: list[JobResultInfo], machine: str
+# Return: JobResultInfo 
 def _find_last_completed(
     job_name: str, jobs: list[JobResultInfo], machine: str
 ) -> JobResultInfo:
     """Finds the last completed job before the given job from the original schedule."""
+    '''find the job with the same name as job_name in the list of jobs
+        if the job is not found, raise a ValueError"""
+        if the job is found, set the original_starttime to the start time of the job'''
     for job in jobs:
         if job.name == job_name:
             original_starttime = job.start_time
             break
     else:
         raise ValueError(f"Job {job_name} not found in {jobs}")
+    '''create a list of jobs that are completed before the original_starttime'''
     completed_before = [j for j in jobs if j.completion_time <= original_starttime]
+    '''if the list is empty, return a dummy job"""
+    if the list is not empty, return the job with the maximum completion time in 'completed_before' '''
     if len(completed_before) == 0:
         return JobResultInfo("0", machine, 0.0, 0.0, 0)
 
     return max(completed_before, key=lambda x: x.completion_time)
 
-
+# This function calculates the makespan of the job schedule by executing the schedule with the correct p_ij and s_ij values.
 def calculate_bin_makespan(
     jobs: list[JobResultInfo],
     process_times: PTimes,
@@ -71,8 +79,12 @@ def calculate_bin_makespan(
     Returns:
         float: Makespan according to the given schedule.
     """
+    ''' create a list of job, the job 0 is a dummy job create for ensuring that the first job starts at time 0 and the rest of the jobs are the jobs in the list of jobs'''
     lp_jobs = ["0"] + [job.name for job in jobs]
+    '''create a list of machines, the machines are the keys of the dictionary accelerators'''
     machines = list(accelerators.keys())
+    '''return the makespan of the job schedule by executing the schedule with the correct p_ij and s_ij values
+    the flag for_bin is set to True meaning that the jobs are for the batch'''
     return _calc_makespan(jobs, process_times, setup_times, lp_jobs, machines, True)
 
 
