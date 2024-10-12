@@ -12,7 +12,7 @@ from src.tools import assemble_job
 from .calculate_makespan import calculate_bin_makespan
 from .types import Bin, LPInstance, JobResultInfo, PTimes, STimes
 
-
+   
 def generate_bin_info_schedule(
     jobs: list[JobResultInfo],
     process_times: PTimes,
@@ -31,8 +31,11 @@ def generate_bin_info_schedule(
     Returns:
         tuple[float, list[JobResultInfo]]: The objective value and the schedule.
     """
+    '''Create list for get name of the jobs  '''
     lp_jobs = ["0"] + [job.name for job in jobs]  # TODO
+    '''Create list from keywords in dict "accelerators"'''
     machines = list(accelerators.keys())
+    '''Create dict for time process and time setup. The default value is 0 '''
     p_times = pulp.makeDict(
         [lp_jobs[1:], machines],
         process_times,

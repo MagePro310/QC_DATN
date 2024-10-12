@@ -4,9 +4,8 @@ from copy import deepcopy
 
 import pulp
 
-from .types import JobResultInfo, LPInstance, PTimes, STimes
-# PTimes: Time processing
-# STimes: Time set up
+from .types import JobResultInfo, LPInstance, PTimes, STimes    # PTimes: Time processing, STimes: Time set up
+
 
 def calculate_makespan(
     lp_instance: LPInstance,
@@ -36,12 +35,22 @@ def calculate_makespan(
     )
 
 # Description: This function find the last completed job before the job "job_name" begins.
-# Parameters: job_name: str, jobs: list[JobResultInfo], machine: str
-# Return: JobResultInfo 
 def _find_last_completed(
     job_name: str, jobs: list[JobResultInfo], machine: str
 ) -> JobResultInfo:
-    """Finds the last completed job before the given job from the original schedule."""
+    """Finds the last completed job before the given job from the original schedule.
+    
+    Args:
+        jobs:
+        process_times:
+        setup_times:
+        lp_instance.jobs:
+        lp_instance.machines:
+        
+    Returns:
+        JobResultInfo: The class define for show the infomation of the job
+    """
+    
     '''find the job with the same name as job_name in the list of jobs
         if the job is not found, raise a ValueError"""
         if the job is found, set the original_starttime to the start time of the job'''
